@@ -1,94 +1,224 @@
 <!DOCTYPE html>
-<html lang="hi" class="h-full bg-slate-100">
+<html lang="hi" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ISM Code Portal - Labour Office, Ratlam</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2pdf.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- SheetJS -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- Devanagari Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Rozha+One&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Rozha+One&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Hind', sans-serif; }
-        .font-rozha { font-family: 'Rozha One', serif; }
-        .a4-page {
-            width: 210mm; min-height: 297mm; padding: 20mm;
-            margin: 0 auto; background: #ffffff;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-            position: relative; box-sizing: border-box; word-wrap: break-word;
+        :root {
+            --saffron: #ff9933;
+            --saffron-soft: #ffb86b;
+            --green: #12b886;
+            --indigo: #6366f1;
+            --violet: #8b5cf6;
+            --ink: #0b1026;
         }
-        .var-tag {
-            background-color: #fef08a; color: #854d0e; padding: 1px 5px;
-            border-radius: 4px; font-weight: 600; border: 1px dashed #ca8a04;
-            display: inline-flex; align-items: center; gap: 2px;
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Hind', 'Noto Sans Devanagari', 'Poppins', sans-serif;
+            background: var(--ink);
+            color: #e2e8f0;
+            overflow-x: hidden;
         }
+        .font-rozha { font-family: 'Rozha One', 'Noto Sans Devanagari', serif; }
+        .font-poppins { font-family: 'Poppins', 'Hind', sans-serif; }
+
+        /* Animated background */
+        .bg-aurora {
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,.35), transparent 60%),
+                radial-gradient(900px 500px at 100% 10%, rgba(255,153,51,.22), transparent 60%),
+                radial-gradient(900px 600px at 50% 110%, rgba(18,184,134,.20), transparent 60%),
+                linear-gradient(180deg, #0b1026 0%, #111a3a 100%);
+        }
+        .bg-grid {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+        }
+        .blob {
+            position: fixed; border-radius: 50%; filter: blur(70px); opacity: .45; z-index: 0;
+            animation: float 14s ease-in-out infinite;
+        }
+        .blob.b1 { width: 340px; height: 340px; background: var(--indigo); top: 8%; left: -80px; }
+        .blob.b2 { width: 300px; height: 300px; background: var(--saffron); bottom: 6%; right: -60px; animation-delay: -5s; }
+        .blob.b3 { width: 220px; height: 220px; background: var(--green); top: 55%; left: 40%; animation-delay: -9s; opacity: .25; }
+        @keyframes float {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(30px,-40px) scale(1.1); }
+        }
+
+        /* Gradient text */
+        .grad-text {
+            background: linear-gradient(90deg, #ffb86b 0%, #ff9933 35%, #f472b6 70%, #a78bfa 100%);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; color: transparent;
+            background-size: 200% auto;
+            animation: shine 6s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* Glass */
+        .glass {
+            background: linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+            border: 1px solid rgba(255,255,255,.14);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 20px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
+        }
+
+        /* Tricolor strip */
+        .tricolor { height: 4px; background: linear-gradient(90deg, #ff9933 0 33.3%, #ffffff 33.3% 66.6%, #138808 66.6% 100%); }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #ff9933, #f97316);
+            color: #fff; font-weight: 700;
+            box-shadow: 0 8px 24px rgba(249,115,22,.4);
+            transition: transform .2s, box-shadow .2s, filter .2s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(249,115,22,.55); filter: brightness(1.07); }
+        .btn-ghost {
+            background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #f1f5f9;
+            transition: all .2s;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,.16); transform: translateY(-2px); }
+        .btn-green {
+            background: linear-gradient(135deg, #12b886, #0ca678); color:#fff; font-weight:700;
+            box-shadow: 0 8px 24px rgba(18,184,134,.4); transition: all .2s;
+        }
+        .btn-green:hover { transform: translateY(-2px); filter: brightness(1.08); }
+        button:disabled { opacity: .6; cursor: not-allowed; transform: none !important; }
+
+        /* Feature cards */
+        .feat-card { transition: transform .3s, border-color .3s; }
+        .feat-card:hover { transform: translateY(-6px); border-color: rgba(255,153,51,.5); }
+        .icon-box {
+            width: 48px; height: 48px; border-radius: 14px; display:flex; align-items:center; justify-content:center;
+            font-size: 20px; color: #fff;
+        }
+
+        /* Entrance animations */
+        .fade-up { opacity: 0; transform: translateY(24px); animation: fadeUp .8s ease forwards; }
+        .d1 { animation-delay: .1s; } .d2 { animation-delay: .25s; } .d3 { animation-delay: .4s; } .d4 { animation-delay: .55s; }
+        @keyframes fadeUp { to { opacity: 1; transform: none; } }
+
+        .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 0 rgba(52,211,153,.7); animation: pulse 2s infinite; }
+        @keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(52,211,153,0); } 100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); } }
+
+        /* Modal */
+        #auth-modal { animation: fadeIn .25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-card { animation: pop .35s cubic-bezier(.2,.9,.3,1.2); }
+        @keyframes pop { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: none; } }
+        .field {
+            width: 100%; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 11px 14px 11px 42px;
+            background: #f8fafc; color: #0f172a; transition: all .2s; font-size: 14px;
+        }
+        .field:focus { outline: none; background: #fff; border-color: var(--indigo); box-shadow: 0 0 0 4px rgba(99,102,241,.15); }
+        .field.green:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(18,184,134,.18); }
+        .field-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 14px; }
+        ::selection { background: #ff9933; color: #fff; }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col">
 
-    <!-- LANDING PAGE & AUTHENTICATION SECTION -->
-    <div id="landing-screen" class="min-h-screen flex flex-col justify-between bg-slate-900 text-white">
-        <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-indigo-600 p-2 rounded-lg text-white">
-                        <i class="fa-solid fa-scale-balanced text-xl"></i>
+    <!-- Background layers -->
+    <div class="bg-aurora"></div>
+    <div class="bg-grid"></div>
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+    <!-- LANDING -->
+    <div id="landing-screen" class="relative z-10 min-h-screen flex flex-col justify-between">
+        <div class="tricolor"></div>
+
+        <header class="sticky top-0 z-40 border-b border-white/10 bg-[#0b1026]/70 backdrop-blur-xl">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-lg"
+                         style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">
+                        <i class="fa-solid fa-scale-balanced text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-lg leading-tight">PatraSetu</h1>
-                        <p class="text-xs text-slate-400">ISM Code A4 पत्र एवं बहु-रिकॉर्ड जनरेटर पोर्टल</p>
+                        <h1 class="font-poppins font-extrabold text-lg leading-tight text-white tracking-wide">Patra<span style="color:#ff9933">Setu</span></h1>
+                        <p class="text-[11px] sm:text-xs text-slate-400">ISM Code A4 पत्र एवं बहु-रिकॉर्ड जनरेटर पोर्टल</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="openAuthModal('login')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
-                        <i class="fa-solid fa-right-to-bracket mr-1.5 text-emerald-400"></i> लॉगिन करें
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <button onclick="openAuthModal('login')" class="btn-ghost px-3 sm:px-4 py-2 text-sm font-semibold rounded-xl">
+                        <i class="fa-solid fa-right-to-bracket mr-1.5 text-emerald-400"></i> लॉगिन
                     </button>
-                    <button onclick="openAuthModal('register')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg transition">
-                        <i class="fa-solid fa-user-plus mr-1.5"></i> नया यूज़र बनाएं
+                    <button onclick="openAuthModal('register')" class="btn-primary px-3 sm:px-4 py-2 text-sm rounded-xl">
+                        <i class="fa-solid fa-user-plus mr-1.5"></i> नया यूज़र
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-6 py-12 flex-1 flex flex-col justify-center">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-16 flex-1 flex flex-col justify-center w-full">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+                <!-- Left -->
                 <div class="space-y-6">
-                    <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider">
-                        Digital and Automation
+                    <span class="fade-up inline-flex items-center gap-2 bg-white/5 text-amber-300 border border-amber-400/30 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest font-poppins">
+                        <span class="pulse-dot"></span> Digital &amp; Automation
                     </span>
-                    <h2 class="text-4xl lg:text-5xl font-extrabold text-white leading-tight">
-                        Letters / Orders / Notices <br><span class="text-indigo-400">
-Generate automatically</span>
+
+                    <h2 class="fade-up d1 font-poppins text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.12]">
+                        Letters / Orders / Notices
+                        <br><span class="grad-text">Generate Automatically</span>
                     </h2>
-                    <p class="text-slate-300 text-base leading-relaxed">
-                            By using the portal, various types of letters can be generated simultaneously, resulting in time savings and high-quality work.
+
+                    <p class="fade-up d2 text-slate-300 text-lg leading-relaxed max-w-xl">
+                        पोर्टल की मदद से एक साथ कई प्रकार के पत्र तैयार करें — <span class="text-amber-300 font-semibold">समय की बचत</span> और <span class="text-emerald-300 font-semibold">उच्च गुणवत्ता</span> वाला काम।
                     </p>
+
+                    <div class="fade-up d3 flex flex-wrap gap-3 pt-2">
+                        <button onclick="openAuthModal('login')" class="btn-primary px-6 py-3 rounded-xl text-base">
+                            अभी शुरू करें <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                        <button onclick="openAuthModal('register')" class="btn-ghost px-6 py-3 rounded-xl text-base font-semibold">
+                            <i class="fa-solid fa-user-plus mr-2 text-indigo-300"></i> खाता बनाएं
+                        </button>
+                    </div>
+
+                    <div class="fade-up d4 flex flex-wrap gap-6 pt-4 text-sm text-slate-400">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-file-pdf text-rose-400"></i> A4 PDF</span>
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-layer-group text-sky-400"></i> बहु-रिकॉर्ड</span>
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-bolt text-amber-400"></i> तुरंत तैयार</span>
+                    </div>
                 </div>
 
-                <div class="bg-slate-800/40 border border-slate-700/60 p-8 rounded-2xl shadow-2xl relative overflow-hidden">
-                    <h3 class="text-xl font-bold text-slate-100 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-info text-sky-400"></i> वेबसाइट निर्देश एवं सुरक्षा
+                <!-- Right -->
+                <div class="fade-up d2 glass p-7 sm:p-8 rounded-3xl relative overflow-hidden">
+                    <div class="absolute -top-16 -right-16 w-48 h-48 rounded-full opacity-30 blur-2xl" style="background:#ff9933"></div>
+                    <h3 class="font-bold text-xl text-white mb-5 flex items-center gap-3 relative">
+                        <span class="icon-box" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);width:40px;height:40px;font-size:16px"><i class="fa-solid fa-shield-halved"></i></span>
+                        वेबसाइट निर्देश एवं सुरक्षा
                     </h3>
-                    <ul class="space-y-3 text-sm text-slate-300">
-                        <li class="flex items-start gap-2.5">
-                            <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
-                            <span>यूज़र आईडी और पासवर्ड Google Sheet डेटाबेस से सुरक्षित रूप से सत्यापित होते हैं।.</span>
+
+                    <ul class="space-y-4 text-[15px] text-slate-200 relative">
+                        <li class="flex items-start gap-3 feat-card glass rounded-2xl p-4">
+                            <span class="icon-box shrink-0" style="background:linear-gradient(135deg,#10b981,#059669)"><i class="fa-solid fa-lock"></i></span>
+                            <span>यूज़र आईडी और पासवर्ड <b class="text-emerald-300">Google Sheet</b> डेटाबेस से सुरक्षित रूप से सत्यापित होते हैं।</span>
                         </li>
-                        <li class="flex items-start gap-2.5">
-                            <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
-                            <span>नया खाता बनाने पर जानकारी तुरंत Google Sheet में दर्ज हो जाती है।.</span>
+                        <li class="flex items-start gap-3 feat-card glass rounded-2xl p-4">
+                            <span class="icon-box shrink-0" style="background:linear-gradient(135deg,#f59e0b,#ea580c)"><i class="fa-solid fa-table"></i></span>
+                            <span>नया खाता बनाने पर जानकारी तुरंत <b class="text-amber-300">Google Sheet</b> में दर्ज हो जाती है।</span>
                         </li>
                     </ul>
-                    <div class="mt-8 pt-6 border-t border-slate-700/60 flex items-center justify-between">
-                        <span class="text-xs text-slate-400"></span>
-                        <button onclick="openAuthModal('login')" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+
+                    <div class="mt-7 pt-5 border-t border-white/10 flex items-center justify-between relative">
+                        <span class="text-xs text-slate-400 flex items-center gap-2"><span class="pulse-dot"></span> सिस्टम ऑनलाइन</span>
+                        <button onclick="openAuthModal('login')" class="text-sm font-bold text-amber-300 hover:text-amber-200 flex items-center gap-1.5">
                             अभी लॉगिन करें <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
@@ -96,71 +226,100 @@ Generate automatically</span>
             </div>
         </main>
 
-        <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
-            © 2026|All rights reserved
+        <footer class="border-t border-white/10 text-center py-4 text-xs text-slate-500 bg-[#0b1026]/60">
+            © 2026 | Labour Office, Ratlam | All rights reserved
         </footer>
     </div>
 
     <!-- AUTH MODAL -->
-    <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white text-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 relative">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="modal-card bg-white text-slate-800 rounded-3xl shadow-2xl max-w-md w-full relative overflow-hidden">
+            <div class="tricolor"></div>
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
 
-            <!-- Login Form -->
-            <div id="login-form-container">
-                <div class="text-center mb-6">
-                    <h3 class="text-xl font-bold text-slate-900">पोर्टल लॉगिन करें</h3>
+            <div class="p-7">
+                <!-- Login -->
+                <div id="login-form-container">
+                    <div class="text-center mb-6">
+                        <div class="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center text-white text-xl shadow-lg mb-3" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">
+                            <i class="fa-solid fa-user-lock"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900">पोर्टल लॉगिन करें</h3>
+                        <p class="text-xs text-slate-500 mt-1">अपनी यूज़र आईडी और पासवर्ड दर्ज करें</p>
+                    </div>
+                    <form onsubmit="handleLogin(event)" class="space-y-4 text-sm">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1.5">User ID</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-user field-icon"></i>
+                                <input type="text" id="login-userid" required placeholder="जैसे: ratlam_admin" class="field">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1.5">Password</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-key field-icon"></i>
+                                <input type="password" id="login-password" required placeholder="••••••••" class="field">
+                            </div>
+                        </div>
+                        <button type="submit" id="login-btn" class="w-full btn-primary py-3 rounded-xl text-base" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 8px 24px rgba(99,102,241,.4)">
+                            लॉगिन करें <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </form>
+                    <p class="text-xs text-center text-slate-500 mt-5">
+                        नया खाता बनाना चाहते हैं? <button onclick="toggleAuthMode('register')" class="text-indigo-600 font-bold hover:underline">यहाँ क्लिक करें</button>
+                    </p>
                 </div>
-                <form onsubmit="handleLogin(event)" class="space-y-4 text-sm">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">User ID</label>
-                        <input type="text" id="login-userid" required placeholder="जैसे: ratlam_admin" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Password</label>
-                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    </div>
-                    <button type="submit" id="login-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg shadow-md transition">
-                        लॉगिन करें
-                    </button>
-                </form>
-                <p class="text-xs text-center text-slate-500 mt-4">
-                    नया खाता बनाना चाहते हैं? <button onclick="toggleAuthMode('register')" class="text-indigo-600 font-bold hover:underline">यहाँ क्लिक करें</button>
-                </p>
-            </div>
 
-            <!-- Register Form -->
-            <div id="register-form-container" class="hidden">
-                <div class="text-center mb-6">
-                    <h3 class="text-xl font-bold text-slate-900">नया यूज़र बनाएं</h3>
+                <!-- Register -->
+                <div id="register-form-container" class="hidden">
+                    <div class="text-center mb-6">
+                        <div class="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center text-white text-xl shadow-lg mb-3" style="background:linear-gradient(135deg,#12b886,#0ca678)">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900">नया यूज़र बनाएं</h3>
+                        <p class="text-xs text-slate-500 mt-1">कुछ ही सेकंड में अपना खाता बनाएं</p>
+                    </div>
+                    <form onsubmit="handleRegister(event)" class="space-y-4 text-sm">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1.5">पूरा नाम</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-id-badge field-icon"></i>
+                                <input type="text" id="reg-fullname" required placeholder="अधिकारी नाम" class="field green">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1.5">User ID</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-user field-icon"></i>
+                                <input type="text" id="reg-userid" required placeholder="unique_user_id" class="field green">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1.5">Password</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-key field-icon"></i>
+                                <input type="password" id="reg-password" required placeholder="••••••••" class="field green">
+                            </div>
+                        </div>
+                        <button type="submit" id="reg-btn" class="w-full btn-green py-3 rounded-xl text-base">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> खाता बनाएं (Save to Sheet)
+                        </button>
+                    </form>
+                    <p class="text-xs text-center text-slate-500 mt-5">
+                        खाता मौजूद है? <button onclick="toggleAuthMode('login')" class="text-emerald-600 font-bold hover:underline">लॉगिन करें</button>
+                    </p>
                 </div>
-                <form onsubmit="handleRegister(event)" class="space-y-4 text-sm">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">पूरा नाम</label>
-                        <input type="text" id="reg-fullname" required placeholder="अधिकारी नाम" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">User ID</label>
-                        <input type="text" id="reg-userid" required placeholder="unique_user_id" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Password</label>
-                        <input type="password" id="reg-password" required placeholder="••••••••" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                    </div>
-                    <button type="submit" id="reg-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow-md transition">
-                        खाता बनाएं (Save to Sheet)
-                    </button>
-                </form>
-                <p class="text-xs text-center text-slate-500 mt-4">
-                    खाता मौजूद है? <button onclick="toggleAuthMode('login')" class="text-emerald-600 font-bold hover:underline">लॉगिन करें</button>
-                </p>
+
+                <div id="auth-status-msg" class="mt-4 text-sm text-center font-bold hidden rounded-lg py-2"></div>
             </div>
-            <div id="auth-status-msg" class="mt-3 text-xs text-center font-bold hidden"></div>
         </div>
     </div>
 
     <script>
-        // Yahan apna Google Apps Script Web App URL daalein[cite: 2]
+        // Yahan apna Google Apps Script Web App URL daalein
         const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyp-WkvFWxXljWbep-j_vmHYeHmVtHcdDzL-4ANPmNaZoNWjw18R8EakrOBNsl7BVFCEg/exec";
 
         window.onload = function() {
@@ -190,7 +349,7 @@ Generate automatically</span>
         function showStatus(msg, isSuccess) {
             const statusDiv = document.getElementById('auth-status-msg');
             statusDiv.innerText = msg;
-            statusDiv.className = `mt-3 text-xs text-center font-bold block ${isSuccess ? 'text-emerald-600' : 'text-rose-600'}`;
+            statusDiv.className = `mt-4 text-sm text-center font-bold block rounded-lg py-2 ${isSuccess ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'}`;
         }
 
         async function handleRegister(e) {
