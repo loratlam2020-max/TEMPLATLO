@@ -29,15 +29,12 @@
             border-radius: 4px; font-weight: 600; border: 1px dashed #ca8a04;
             display: inline-flex; align-items: center; gap: 2px;
         }
-        .var-tag.formula-tag { background-color: #dcfce7; color: #166534; border-color: #22c55e; }
-        .var-tag.kathan-tag { background-color: #e0e7ff; color: #3730a3; border-color: #6366f1; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen flex flex-col">
 
-    <!-- LANDING PAGE & AUTHENTICATION SECTION (VISIBLE BY DEFAULT) -->
+    <!-- LANDING PAGE & AUTHENTICATION SECTION -->
     <div id="landing-screen" class="min-h-screen flex flex-col justify-between bg-slate-900 text-white">
-        <!-- Header Nav -->
         <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                 <div class="flex items-center space-x-3">
@@ -60,7 +57,6 @@
             </div>
         </header>
 
-        <!-- Hero & Portal Info Section -->
         <main class="max-w-7xl mx-auto px-6 py-12 flex-1 flex flex-col justify-center">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div class="space-y-6">
@@ -71,41 +67,22 @@
                         न्यायालयीन आदेश एवं नोटिस <br><span class="text-indigo-400">ऑटोमेटेड जनरेट करें</span>
                     </h2>
                     <p class="text-slate-300 text-base leading-relaxed">
-                        यह पोर्टल श्रम कार्यालय रतलाम एवं उपादान भुगतान अधिनियम, 1972 के तहत प्रकरणों, नोटिसों, नोटिस-पत्रों और बहु-रिकॉर्ड डेटा प्रविष्टियों को स्वचालित रूप से तैयार करने के लिए डिज़ाइन किया गया है।
+                        यह पोर्टल श्रम कार्यालय रतलाम एवं उपादान भुगतान अधिनियम, 1972 के तहत प्रकरणों, नोटिसों और बहु-रिकॉर्ड डेटा प्रविष्टियों को स्वचालित रूप से तैयार करने کے लिए डिज़ाइन किया गया है[cite: 2].
                     </p>
-
-                    <div class="grid grid-cols-2 gap-4 pt-4">
-                        <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
-                            <i class="fa-solid fa-file-excel text-emerald-400 text-2xl mb-2"></i>
-                            <h3 class="font-bold text-sm text-slate-100">Excel / CSV Import</h3>
-                            <p class="text-xs text-slate-400 mt-1">हजारों रिकॉर्ड सीधे एक्सल से अपलोड करके एक क्लिक में पत्र बनाएं।</p>
-                        </div>
-                        <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
-                            <i class="fa-solid fa-calculator text-amber-400 text-2xl mb-2"></i>
-                            <h3 class="font-bold text-sm text-slate-100">ऑटो फॉर्मूला एवं गणना</h3>
-                            <p class="text-xs text-slate-400 mt-1">सेवा अवधि (DATEDIFF) एवं तिथियों की सटीक स्वचालित गणना।</p>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Info Card -->
                 <div class="bg-slate-800/40 border border-slate-700/60 p-8 rounded-2xl shadow-2xl relative overflow-hidden">
-                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-600/10 rounded-full blur-3xl"></div>
                     <h3 class="text-xl font-bold text-slate-100 mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-circle-info text-sky-400"></i> वेबसाइट निर्देश एवं सुरक्षा
                     </h3>
                     <ul class="space-y-3 text-sm text-slate-300">
                         <li class="flex items-start gap-2.5">
                             <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
-                            <span>यूज़र आईडी और पासवर्ड Google Sheet डेटाबेस से सुरक्षित रूप से सत्यापित होते हैं।</span>
+                            <span>यूज़र आईडी और पासवर्ड Google Sheet डेटाबेस से सुरक्षित रूप से सत्यापित होते हैं[cite: 2].</span>
                         </li>
                         <li class="flex items-start gap-2.5">
                             <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
-                            <span>नया खाते बनाने पर यूज़र की जानकारी तुरंत केंद्रीय Google Sheet में दर्ज हो जाती है।</span>
-                        </li>
-                        <li class="flex items-start gap-2.5">
-                            <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
-                            <span>लॉगिन के पश्चात ही लेटर जनरेटर, टेम्प्लेट मेनु एवं प्रिंट/एक्सपोर्ट सुविधाएं उपलब्ध होंगी।</span>
+                            <span>नया खाता बनाने पर जानकारी तुरंत Google Sheet में दर्ज हो जाती है[cite: 2].</span>
                         </li>
                     </ul>
                     <div class="mt-8 pt-6 border-t border-slate-700/60 flex items-center justify-between">
@@ -119,11 +96,11 @@
         </main>
 
         <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
-            © 2026 श्रम कार्यालय, जिला-रतलाम (म.प्र.) | सर्वाधिकार सुरक्षित।
+            © 2026 श्रम कार्यालय, जिला-रतलाम (म.प्र.) | सर्वाधिकार सुरक्षित[cite: 2].
         </footer>
     </div>
 
-    <!-- AUTH MODAL (LOGIN / REGISTER) -->
+    <!-- AUTH MODAL -->
     <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white text-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 relative">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -131,13 +108,8 @@
             <!-- Login Form -->
             <div id="login-form-container">
                 <div class="text-center mb-6">
-                    <div class="bg-indigo-100 text-indigo-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold">
-                        <i class="fa-solid fa-lock"></i>
-                    </div>
                     <h3 class="text-xl font-bold text-slate-900">पोर्टल लॉगिन करें</h3>
-                    <p class="text-xs text-slate-500 mt-1">अपनी पंजीकृत Google Sheet ID से लॉगिन करें</p>
                 </div>
-
                 <form onsubmit="handleLogin(event)" class="space-y-4 text-sm">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">User ID</label>
@@ -147,11 +119,10 @@
                         <label class="block font-semibold text-slate-700 mb-1">Password</label>
                         <input type="password" id="login-password" required placeholder="••••••••" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
-                    <button type="submit" id="login-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg shadow-md transition flex items-center justify-center gap-2">
-                        <span>लॉगिन करें</span> <i class="fa-solid fa-arrow-right"></i>
+                    <button type="submit" id="login-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg shadow-md transition">
+                        लॉगिन करें
                     </button>
                 </form>
-
                 <p class="text-xs text-center text-slate-500 mt-4">
                     नया खाता बनाना चाहते हैं? <button onclick="toggleAuthMode('register')" class="text-indigo-600 font-bold hover:underline">यहाँ क्लिक करें</button>
                 </p>
@@ -160,17 +131,12 @@
             <!-- Register Form -->
             <div id="register-form-container" class="hidden">
                 <div class="text-center mb-6">
-                    <div class="bg-emerald-100 text-emerald-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold">
-                        <i class="fa-solid fa-user-plus"></i>
-                    </div>
                     <h3 class="text-xl font-bold text-slate-900">नया यूज़र बनाएं</h3>
-                    <p class="text-xs text-slate-500 mt-1">खाता की जानकारी सीधे Google Sheet में सेव होगी</p>
                 </div>
-
                 <form onsubmit="handleRegister(event)" class="space-y-4 text-sm">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">पूरा नाम (Full Name)</label>
-                        <input type="text" id="reg-fullname" required placeholder="जैसे: अधिकारी नाम" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <label class="block font-semibold text-slate-700 mb-1">पूरा नाम</label>
+                        <input type="text" id="reg-fullname" required placeholder="अधिकारी नाम" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">User ID</label>
@@ -180,83 +146,27 @@
                         <label class="block font-semibold text-slate-700 mb-1">Password</label>
                         <input type="password" id="reg-password" required placeholder="••••••••" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
-                    <button type="submit" id="reg-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow-md transition flex items-center justify-center gap-2">
-                        <span>खाता बनाएं (Save to Sheet)</span> <i class="fa-solid fa-floppy-disk"></i>
+                    <button type="submit" id="reg-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow-md transition">
+                        खाता बनाएं (Save to Sheet)
                     </button>
                 </form>
-
                 <p class="text-xs text-center text-slate-500 mt-4">
-                    पहले से खाता मौजूद है? <button onclick="toggleAuthMode('login')" class="text-emerald-600 font-bold hover:underline">लॉगिन करें</button>
+                    खाता मौजूद है? <button onclick="toggleAuthMode('login')" class="text-emerald-600 font-bold hover:underline">लॉगिन करें</button>
                 </p>
             </div>
-            
             <div id="auth-status-msg" class="mt-3 text-xs text-center font-bold hidden"></div>
         </div>
     </div>
 
-    <!-- MAIN HOME PORTAL (LOGGED IN SCREEN - HIDDEN BY DEFAULT) -->
-    <div id="main-portal-screen" class="hidden min-h-screen flex flex-col">
-        <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between h-14">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-indigo-600 p-1.5 rounded-lg text-white">
-                        <i class="fa-solid fa-file-contract text-lg"></i>
-                    </div>
-                    <span class="font-bold text-base tracking-wide text-slate-100">LABOUR OFFICE, RATLAM</span>
-                </div>
-
-                <div class="flex items-center gap-3 text-xs">
-                    <span class="text-slate-300 bg-slate-800 px-3 py-1 rounded-md border border-slate-700">
-                        <i class="fa-solid fa-user-circle text-emerald-400 mr-1"></i> <span id="user-display-name">User</span>
-                    </span>
-                    <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-md font-semibold transition">
-                        <i class="fa-solid fa-right-from-bracket mr-1"></i> लॉगआउट
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <main class="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col gap-4">
-            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
-                <h2 class="text-xl font-bold text-slate-900 mb-2">ISM Code सम्पादक होम पेज में आपका स्वागत है!</h2>
-                <p class="text-slate-600 text-sm">आप सफलतापूर्वक Google Sheet Authentication द्वारा लॉगिन हो चुके हैं।</p>
-            </div>
-
-            <!-- Letter Editor Canvas -->
-            <div class="flex flex-col items-center justify-center p-6 bg-slate-300 rounded-xl border border-slate-400 overflow-x-auto">
-                <div id="a4-editor-canvas" class="a4-page text-slate-800 flex flex-col justify-between">
-                    <div>
-                        <div class="border-b-2 border-slate-800 pb-3 mb-6 text-center">
-                            <h2 class="font-bold tracking-wide text-slate-900 leading-snug font-rozha text-lg">
-                                न्यायालय नियंत्रक प्राधिकारी, उपादान भुगतान अधिनियम, 1972 एवं कार्यालय श्रम पदाधिकारी, जिला-रतलाम (म.प्र.)
-                            </h2>
-                            <p class="text-xs text-slate-700 mt-1.5">
-                                नवीन कलेक्टोरेट भवन, द्वितीय तल, कक्ष क्र. 229, रतलाम - 457001
-                            </p>
-                        </div>
-                        <div id="letter-body-editor" contenteditable="true" class="text-base min-h-[400px] focus:outline-none">
-                            <p class="text-right">रतलाम, दिनांक: <span class="var-tag">{{दिनांक}}</span></p>
-                            <br>
-                            <p>प्रति,<br>&nbsp;&nbsp;&nbsp;&nbsp;श्री/श्रीमती <strong><span class="var-tag">{{आवेदक_का_नाम}}</span></strong></p>
-                            <br>
-                            <p>विषय: <strong><span class="var-tag">{{विषय}}</span></strong> के संबंध में।</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- SCRIPT FOR GOOGLE SHEET AUTH & NAVIGATION -->
     <script>
-        // *** यहाँ अपना APPS SCRIPT WEB APP URL डालें ***
-        const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwN_aogzN9YHpAz4AWBaUOBpJV75cWvN9BUxLa97bUTld2te0yXx66j5vVXE_xCJwk6WQ/exec";
+        // Yahan apna Google Apps Script Web App URL daalein[cite: 2]
+        const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyp-WkvFWxXljWbep-j_vmHYeHmVtHcdDzL-4ANPmNaZoNWjw18R8EakrOBNsl7BVFCEg/exec";
 
         window.onload = function() {
-            // Check if session exists
             const savedUser = localStorage.getItem("loggedInUser");
             if (savedUser) {
-                showPortal(JSON.parse(savedUser));
+                // Agar pehle se logged in hai toh seedhe home.html par bhej dein
+                window.location.href = "home.html";
             }
         };
 
@@ -282,35 +192,24 @@
             statusDiv.className = `mt-3 text-xs text-center font-bold block ${isSuccess ? 'text-emerald-600' : 'text-rose-600'}`;
         }
 
-        // REGISTER USER TO GOOGLE SHEET
         async function handleRegister(e) {
             e.preventDefault();
             const fullName = document.getElementById('reg-fullname').value;
             const userId = document.getElementById('reg-userid').value;
             const password = document.getElementById('reg-password').value;
-
             const btn = document.getElementById('reg-btn');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving...`;
 
             try {
                 const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        action: 'register',
-                        fullName: fullName,
-                        userId: userId,
-                        password: password
-                    })
+                    body: JSON.stringify({ action: 'register', fullName, userId, password })
                 });
-
                 const result = await response.json();
                 if (result.status === "success") {
                     showStatus(result.message, true);
-                    setTimeout(() => {
-                        toggleAuthMode('login');
-                    }, 1500);
+                    setTimeout(() => toggleAuthMode('login'), 1500);
                 } else {
                     showStatus(result.message, false);
                 }
@@ -318,38 +217,29 @@
                 showStatus("Google Sheet API से कनेक्ट करने में विफल!", false);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<span>खाता बनाएं (Save to Sheet)</span> <i class="fa-solid fa-floppy-disk"></i>`;
             }
         }
 
-        // LOGIN USER MATCHING GOOGLE SHEET
         async function handleLogin(e) {
             e.preventDefault();
             const userId = document.getElementById('login-userid').value;
             const password = document.getElementById('login-password').value;
-
             const btn = document.getElementById('login-btn');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verifying...`;
 
             try {
                 const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        action: 'login',
-                        userId: userId,
-                        password: password
-                    })
+                    body: JSON.stringify({ action: 'login', userId, password })
                 });
-
                 const result = await response.json();
                 if (result.status === "success") {
                     showStatus("लॉगिन सफल!", true);
                     localStorage.setItem("loggedInUser", JSON.stringify(result.user));
                     setTimeout(() => {
                         closeAuthModal();
-                        showPortal(result.user);
+                        window.location.href = "home.html"; // Redirect to main dashboard
                     }, 800);
                 } else {
                     showStatus(result.message, false);
@@ -358,20 +248,7 @@
                 showStatus("Google Sheet API से कनेक्ट करने में विफल!", false);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<span>लॉगिन करें</span> <i class="fa-solid fa-arrow-right"></i>`;
             }
-        }
-
-        function showPortal(user) {
-            document.getElementById('landing-screen').classList.add('hidden');
-            document.getElementById('main-portal-screen').classList.remove('hidden');
-            document.getElementById('user-display-name').innerText = user.fullName || user.userId;
-        }
-
-        function handleLogout() {
-            localStorage.removeItem("loggedInUser");
-            document.getElementById('main-portal-screen').classList.add('hidden');
-            document.getElementById('landing-screen').classList.remove('hidden');
         }
     </script>
 </body>
