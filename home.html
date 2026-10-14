@@ -183,6 +183,16 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
+                <!-- Logged in user info & Logout Button added -->
+                <span class="text-slate-300 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
+                    <i class="fa-solid fa-user-circle text-emerald-400 mr-1"></i> <span id="user-display-name">User</span>
+                </span>
+                <button onclick="handleLogout()" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-700 text-white font-semibold transition flex items-center gap-1">
+                    <i class="fa-solid fa-right-from-bracket"></i> लॉगआउट
+                </button>
+
+                <div class="h-4 w-[1px] bg-slate-700 mx-1"></div>
+
                 <div class="relative inline-block text-left group">
                     <button class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 flex items-center gap-1.5 text-slate-200 border border-slate-700">
                         <i class="fa-solid fa-folder-open text-amber-400"></i> टेम्पलेट मेनु <i class="fa-solid fa-chevron-down text-[10px]"></i>
@@ -540,8 +550,24 @@
         ];
 
         window.onload = function() {
+            // Index.html se connect karne ke liye login check
+            const savedUser = localStorage.getItem("loggedInUser");
+            if (!savedUser) {
+                // Agar user logged-in nahi hai toh seedha Index.html par bhej dein
+                window.location.href = "Index.html";
+                return;
+            }
+            const user = JSON.parse(savedUser);
+            document.getElementById('user-display-name').innerText = user.fullName || user.userId;
+
             scanForVariables();
         };
+
+        // Logout function added to return to Index.html
+        function handleLogout() {
+            localStorage.removeItem("loggedInUser");
+            window.location.href = "Index.html";
+        }
 
         function switchTab(tab) {
             document.getElementById('section-editor').classList.toggle('hidden', tab !== 'editor');
