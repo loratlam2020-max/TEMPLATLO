@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="hi" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISM Code - A4 पत्र एवं बहु-रिकॉर्ड जनरेटर</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf.js for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SheetJS for Excel/CSV Import -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Devanagari Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Devanagari:wght@400;600;700&family=Gotu&family=Hind:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Rozha+One&family=Yatra+One&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Hind', sans-serif;
+            user-select: text;
+        }
+
+        .font-hind { font-family: 'Hind', sans-serif; }
+        .font-noto { font-family: 'Noto Sans Devanagari', sans-serif; }
+        .font-anek { font-family: 'Anek Devanagari', sans-serif; }
+        .font-gotu { font-family: 'Gotu', sans-serif; }
+        .font-rozha { font-family: 'Rozha One', serif; }
+        .font-yatra { font-family: 'Yatra One', serif; }
+        .font-serif-std { font-family: Georgia, Cambria, "Times New Roman", Times, serif; }
+        .font-sans-std { font-family: Arial, Helvetica, sans-serif; }
+
+        /* Clean A4 Page Layout */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding-top: 20mm;
+            padding-bottom: 20mm;
+            padding-left: 20mm;
+            padding-right: 20mm;
+            margin: 0 auto;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            position: relative;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            transition: padding 0.2s ease;
+        }
+
+        .a4-page.landscape {
+            width: 297mm;
+            min-height: 210mm;
+        }
+
+        /* Floating selection action toolbar */
+        #floating-selection-toolbar {
+            position: absolute;
+            display: none;
+            z-index: 1000;
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 4px 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            border: 1px solid #334155;
+            animation: fadeIn 0.12s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Variable Tag Badge Styling */
+        .var-tag {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 1px 5px;
+            margin: 0;
+            border-radius: 4px;
+            font-weight: 600;
+            border: 1px dashed #ca8a04;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            user-select: all;
+            vertical-align: baseline;
+            white-space: nowrap;
+        }
+
+        .var-tag.kathan-tag {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            border-color: #6366f1;
+        }
+
+        .var-tag.formula-tag {
+            background-color: #dcfce7;
+            color: #166534;
+            border-color: #22c55e;
+        }
+
+        .var-tag:hover {
+            background-color: #fecdd3;
+            color: #9f1239;
+            border-color: #e11d48;
+        }
+
+        /* Responsive Custom Scrollbar for Entry Table */
+        .table-scrollbar::-webkit-scrollbar {
+            height: 10px;
+            width: 8px;
+        }
+        .table-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 6px;
+        }
+        .table-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 6px;
+        }
+        .table-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @media print {
+            body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .a4-page {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                min-height: 297mm !important;
+                box-sizing: border-box !important;
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+            .a4-page:last-child {
+                page-break-after: auto;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .var-tag-filled {
+                border-bottom: none !important;
+                text-decoration: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-200 min-h-screen flex flex-col text-slate-800">
+
+    <!-- MAIN APP DASHBOARD -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between h-14">
+            
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 p-1.5 rounded-lg text-white">
+                    <i class="fa-solid fa-file-contract text-lg"></i>
+                </div>
+                <span class="font-bold text-base tracking-wide text-slate-100">LABOUR OFFICE, RATLAM</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
+                <!-- Logged in user info -->
+                <span class="text-slate-300 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
+                    <i class="fa-solid fa-user-circle text-emerald-400 mr-1"></i> <span id="user-display-name">User</span>
+                </span>
+                
+                <!-- Separate Hibernation Button -->
+                <button onclick="triggerHibernation()" class="px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-semibold transition flex items-center gap-1" title="Current state save karein">
+                    <i class="fa-solid fa-moon"></i> हाइबरनेट
+                </button>
+
+                <!-- Separate Logout Button -->
+                <button onclick="handleLogout()" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-700 text-white font-semibold transition flex items-center gap-1">
+                    <i class="fa-solid fa-right-from-bracket"></i> लॉगआउट
+                </button>
+
+                <div class="h-4 w-[1px] bg-slate-700 mx-1"></div>
+
+                <div class="relative inline-block text-left group">
+                    <button class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 flex items-center gap-1.5 text-slate-200 border border-slate-700">
+                        <i class="fa-solid fa-folder-open text-amber-400"></i> टेम्पलेट मेनु <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </button>
+                    <div class="hidden group-hover:block absolute left-0 w-52 bg-white text-slate-800 rounded-lg shadow-xl border border-slate-200 py-1 z-50">
+                        <button onclick="clearCanvasCompletely()" class="w-full text-left px-4 py-2 hover:bg-slate-100 flex items-center gap-2 text-rose-600">
+                            <i class="fa-solid fa-file-circle-plus"></i> नया साफ़ पेज शुरू करें
+                        </button>
+                        <button onclick="saveCurrentTemplate()" class="w-full text-left px-4 py-2 hover:bg-slate-100 flex items-center gap-2 text-indigo-600">
+                            <i class="fa-solid fa-bookmark"></i> वर्तमान टेम्पलेट सहेजें
+                        </button>
+                        <hr class="my-1 border-slate-200">
+                        <div class="px-3 py-1 text-[11px] font-bold text-slate-400 uppercase">आपके सहेजे गए टेम्पलेट</div>
+                        <div id="saved-templates-menu" class="max-h-40 overflow-y-auto"></div>
+                    </div>
+                </div>
+
+                <button onclick="openModal('page-setup-modal')" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 flex items-center gap-1.5 text-slate-200 border border-slate-700">
+                    <i class="fa-solid fa-sliders text-sky-400"></i> पेज सेटअप
+                </button>
+
+                <button onclick="openModal('header-setup-modal')" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 flex items-center gap-1.5 text-slate-200 border border-slate-700">
+                    <i class="fa-solid fa-heading text-purple-400"></i> संस्था शीर्षक
+                </button>
+
+                <div class="h-4 w-[1px] bg-slate-700 mx-1"></div>
+
+                <button onclick="switchTab('editor')" id="tab-editor-btn" class="px-3.5 py-1.5 rounded bg-indigo-600 text-white font-semibold shadow">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> संपादक
+                </button>
+                <button onclick="switchTab('table')" id="tab-table-btn" class="px-3.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                    <i class="fa-solid fa-table-cells mr-1"></i> डेटा तालिका (<span id="var-count-badge">0</span>)
+                </button>
+                <button onclick="switchTab('preview')" id="tab-preview-btn" class="px-3.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                    <i class="fa-solid fa-print mr-1"></i> प्रिंट / एक्सपोर्ट (<span id="records-count-badge">0</span>)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- SECONDARY TOOLBAR FOR EDITOR -->
+    <div id="editor-toolbar" class="sticky top-14 z-30 bg-white border-b border-slate-300 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs">
+            
+            <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-slate-400 font-semibold uppercase text-[10px]">फ़ॉन्ट:</span>
+                <select id="body-font-family" onchange="applyBodyFormatting()" class="border border-slate-300 rounded px-2 py-1 bg-slate-50 focus:ring-1 focus:ring-indigo-500">
+                    <option value="font-hind">Hind (हिन्दी)</option>
+                    <option value="font-noto">Noto Sans Devanagari</option>
+                    <option value="font-anek">Anek Devanagari</option>
+                    <option value="font-gotu">Gotu (गोतू)</option>
+                    <option value="font-rozha">Rozha One (रौझा)</option>
+                    <option value="font-yatra">Yatra One (यात्रा)</option>
+                    <option value="font-serif-std">Times / Serif</option>
+                    <option value="font-sans-std">Arial / Sans-Serif</option>
+                </select>
+
+                <select id="body-font-size" onchange="applyBodyFormatting()" class="border border-slate-300 rounded px-2 py-1 bg-slate-50 focus:ring-1 focus:ring-indigo-500">
+                    <option value="12px">12px</option>
+                    <option value="14px">14px</option>
+                    <option value="16px" selected>16px (सामान्य)</option>
+                    <option value="18px">18px</option>
+                    <option value="20px">20px</option>
+                    <option value="22px">22px</option>
+                </select>
+
+                <div class="flex border border-slate-300 rounded overflow-hidden bg-slate-50">
+                    <button onclick="execCmd('justifyLeft')" class="p-1.5 hover:bg-slate-200 text-slate-700" title="बायां"><i class="fa-solid fa-align-left"></i></button>
+                    <button onclick="execCmd('justifyCenter')" class="p-1.5 hover:bg-slate-200 text-slate-700" title="मध्य"><i class="fa-solid fa-align-center"></i></button>
+                    <button onclick="execCmd('justifyRight')" class="p-1.5 hover:bg-slate-200 text-slate-700" title="दायां"><i class="fa-solid fa-align-right"></i></button>
+                    <button onclick="execCmd('justifyFull')" class="p-1.5 hover:bg-slate-200 text-slate-700" title="जस्टिफाई"><i class="fa-solid fa-align-justify"></i></button>
+                </div>
+
+                <button onclick="execCmd('bold')" class="p-1.5 border border-slate-300 rounded bg-slate-50 hover:bg-slate-200 font-bold px-2.5" title="बोल्ड">B</button>
+                <button onclick="execCmd('italic')" class="p-1.5 border border-slate-300 rounded bg-slate-50 hover:bg-slate-200 italic px-2.5" title="इटैलिक">I</button>
+                <button onclick="execCmd('underline')" class="p-1.5 border border-slate-300 rounded bg-slate-50 hover:bg-slate-200 underline px-2.5" title="अंडरलाइन">U</button>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="openPlaceholderModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1 shadow-sm transition">
+                    <i class="fa-solid fa-tag"></i> प्लेसहोल्डर जोड़ें
+                </button>
+                <button onclick="openFormulaModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1 shadow-sm transition">
+                    <i class="fa-solid fa-calculator"></i> फॉर्मूला जोड़ें
+                </button>
+                <button onclick="removeSelectedOrHoveredTag()" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1 shadow-sm transition">
+                    <i class="fa-solid fa-eraser"></i> प्लेसहोल्डर हटाएं
+                </button>
+                <button onclick="extractAndProceedToTable()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 shadow-sm transition">
+                    तालिका में दर्ज करें <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING SELECTION TOOLBAR -->
+    <div id="floating-selection-toolbar" class="flex items-center space-x-1">
+        <button onmousedown="event.preventDefault(); execCmd('bold');" class="hover:bg-slate-700 px-2.5 py-1 rounded font-bold text-xs flex items-center gap-1 text-white" title="बोल्ड">
+            <i class="fa-solid fa-bold text-[10px]"></i> B
+        </button>
+        <button onmousedown="event.preventDefault(); execCmd('italic');" class="hover:bg-slate-700 px-2.5 py-1 rounded italic text-xs flex items-center gap-1 text-white" title="इटैलिक">
+            <i class="fa-solid fa-italic text-[10px]"></i> I
+        </button>
+        <button onmousedown="event.preventDefault(); execCmd('underline');" class="hover:bg-slate-700 px-2.5 py-1 rounded underline text-xs flex items-center gap-1 text-white" title="अंडरलाइन">
+            <i class="fa-solid fa-underline text-[10px]"></i> U
+        </button>
+        <div class="h-3 w-[1px] bg-slate-600 mx-1"></div>
+        <button onmousedown="event.preventDefault(); openPlaceholderModal();" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] px-2.5 py-1 rounded font-semibold flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-tag text-[10px]"></i> प्लेसहोल्डर बनाएं
+        </button>
+    </div>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col gap-4">
+
+        <!-- SECTION 1: EDITOR -->
+        <section id="section-editor" class="space-y-4">
+            <div class="bg-white px-4 py-2.5 rounded-xl shadow-sm border border-slate-300 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-tags text-indigo-600"></i>
+                    <span class="font-bold text-slate-700">पहचाने गए प्लेसहोल्डर्स एवं फॉर्मूले:</span>
+                </div>
+
+                <div id="detected-vars-list" class="flex flex-wrap gap-1.5 max-w-2xl">
+                    <span class="text-slate-400 italic">कोई नहीं</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center p-6 bg-slate-300 rounded-xl border border-slate-400 overflow-x-auto">
+                <div id="a4-editor-canvas" class="a4-page text-slate-800 flex flex-col justify-between relative">
+                    <div>
+                        <div id="header-container" class="border-b-2 border-slate-800 pb-3 mb-6 text-center">
+                            <h2 id="view-company-name" class="font-bold tracking-wide text-slate-900 leading-snug whitespace-pre-line font-rozha text-lg">
+                                न्यायालय नियंत्रक प्राधिकारी, उपादान भुगतान अधिनियम, 1972 एवं कार्यालय श्रम पदाधिकारी, जिला-रतलाम (म.प्र.)
+                            </h2>
+                            <p id="view-company-sub" class="text-xs text-slate-700 mt-1.5 whitespace-pre-line leading-relaxed">
+                                नवीन कलेक्टोरेट भवन, द्वितीय तल, कक्ष क्र. 229, रतलाम - 457001, - 07412-270455&#10;E-mail : loratlam@mp.gov.in, loratlam2020@gmail.com
+                            </p>
+                        </div>
+
+                        <div id="letter-body-editor" contenteditable="true" oninput="scanForVariables()" class="letter-content font-hind text-base focus:outline-none focus:ring-1 focus:ring-indigo-300 p-2 rounded min-h-[550px]">
+                            <p class="text-right">क्रमांक/श्रम/2026/........... &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; रतलाम, दिनांक: <span class="var-tag" contenteditable="false">{{दिनांक}}</span></p>
+                            <br>
+                            <p>प्रति,<br>&nbsp;&nbsp;&nbsp;&nbsp;श्री/श्रीमती <strong><span class="var-tag" contenteditable="false">{{आवेदक_का_नाम}}</span></strong><br>&nbsp;&nbsp;&nbsp;&nbsp;पिता/पति: <span class="var-tag" contenteditable="false">{{पिता_का_नाम}}</span><br>&nbsp;&nbsp;&nbsp;&nbsp;पता: <span class="var-tag" contenteditable="false">{{पूर्ण_पता}}</span></p>
+                            <br>
+                            <p>विषय: <strong><span class="var-tag" contenteditable="false">{{विषय}}</span></strong> के संबंध में।</p>
+                            <br>
+                            <p>प्रथम नियुक्ति दिनांक: <span class="var-tag" contenteditable="false">{{प्रथम_नियुक्ति_दिनांक}}</span> &nbsp;&nbsp; सेवानिवृत्ति दिनांक: <span class="var-tag" contenteditable="false">{{सेवानिवृत्ति_दिनांक}}</span></p>
+                            <p>कुल सेवा अवधि: <strong><span class="var-tag formula-tag" contenteditable="false">{{=DATEDIFF_Y({{प्रथम_नियुक्ति_दिनांक}},{{सेवानिवृत्ति_दिनांक}})}}</span> वर्ष</strong></p>
+                            <br>
+                            <p>विवरण / कथन: <span class="var-tag kathan-tag" contenteditable="false">{{*मामले_का_विवरण}}</span></p>
+                            <br>
+                            <p>उपरोक्त विषय में प्रकरण क्रमांक <strong><span class="var-tag" contenteditable="false">{{प्रकरण_क्रमांक}}</span></strong> की आगामी सुनवाई दिनांक <strong><span class="var-tag" contenteditable="false">{{सुनवाई_दिनांक}}</span></strong> को नियत की गई है।</p>
+                            <br><br><br>
+                            <p class="text-right">नियंत्रक प्राधिकारी / श्रम पदाधिकारी<br>उपादान भुगतान अधिनियम, 1972<br>जिला-रतलाम (म.प्र.)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: DATA TABLE -->
+        <section id="section-table" class="hidden space-y-4">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-300">
+                <div class="flex flex-wrap justify-between items-center gap-4 border-b pb-4 mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center">
+                            <i class="fa-solid fa-table-list text-indigo-600 mr-2"></i> डेटा प्रविष्टि तालिका (Multi-Record Entry Table)
+                        </h2>
+                        <p class="text-xs text-slate-500">Excel / CSV फ़ाइल से सीधा डेटा इम्पोर्ट करें या सीधे तालिका में टाइप करें।</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <label class="bg-teal-600 hover:bg-teal-700 text-white text-xs md:text-sm px-3.5 py-2 rounded-lg font-semibold flex items-center shadow cursor-pointer transition">
+                            <i class="fa-solid fa-file-excel mr-1.5"></i> Excel / CSV Import
+                            <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" onchange="importExcelData(event)" class="hidden">
+                        </label>
+
+                        <button onclick="addTableRow()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs md:text-sm px-3.5 py-2 rounded-lg font-medium flex items-center shadow transition">
+                            <i class="fa-solid fa-plus mr-1.5"></i> नया रिकॉर्ड जोड़ें
+                        </button>
+                        <button onclick="clearAllTableData()" class="bg-slate-100 hover:bg-rose-50 text-rose-600 text-xs md:text-sm px-3 py-2 rounded-lg font-medium border border-slate-300 flex items-center transition">
+                            <i class="fa-solid fa-trash-can mr-1.5"></i> साफ़ करें
+                        </button>
+                        <button onclick="generateAllLetters()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg font-semibold flex items-center shadow transition">
+                            पत्र जनरेट करें <i class="fa-solid fa-wand-magic-sparkles ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto max-h-[500px] rounded-lg border border-slate-300 shadow-inner table-scrollbar relative">
+                    <table id="records-table" class="w-full text-left text-sm text-slate-700 border-collapse min-w-max">
+                        <thead class="bg-slate-100 text-slate-800 text-xs uppercase font-bold sticky top-0 border-b border-slate-300 z-20">
+                            <tr id="table-header-row"></tr>
+                        </thead>
+                        <tbody id="table-body-rows" class="divide-y divide-slate-200 bg-white"></tbody>
+                    </table>
+                </div>
+
+                <div id="table-empty-msg" class="hidden text-center py-10 text-slate-400 text-sm">
+                    <i class="fa-solid fa-circle-exclamation text-2xl text-amber-500 mb-2 block"></i>
+                    कोई प्लेसहोल्डर नहीं मिला! संपादक में जाएं और प्लेसहोल्डर या फॉर्मूला जोड़ें।
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: PREVIEW & PRINT -->
+        <section id="section-preview" class="hidden space-y-4">
+            <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-300 flex flex-wrap justify-between items-center gap-4 sticky top-14 z-30">
+                <div class="flex items-center space-x-3">
+                    <span class="text-sm font-semibold text-slate-700">कुल जनरेटेड पत्र: <span id="generated-count" class="bg-indigo-100 text-indigo-800 font-bold px-2.5 py-0.5 rounded-full text-sm">0</span></span>
+                    <button onclick="switchTab('table')" class="text-xs text-indigo-600 hover:underline"><i class="fa-solid fa-pen"></i> डेटा बदलो</button>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs md:text-sm px-4 py-2 rounded-lg font-medium flex items-center shadow transition">
+                        <i class="fa-solid fa-print mr-1.5 text-amber-400"></i> सीधे प्रिंट करें
+                    </button>
+                    <button onclick="exportAllPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg font-medium flex items-center shadow transition">
+                        <i class="fa-solid fa-file-pdf mr-1.5"></i> PDF डाउनलोड
+                    </button>
+                    <button onclick="exportAllDoc()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg font-medium flex items-center shadow transition">
+                        <i class="fa-solid fa-file-word mr-1.5"></i> Word (.doc) डाउनलोड
+                    </button>
+                </div>
+            </div>
+
+            <div id="print-area" class="space-y-8 flex flex-col items-center py-6 bg-slate-300 rounded-xl"></div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: PAGE SETUP -->
+    <div id="page-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-slate-200">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-sky-500"></i> पेज सेटअप एवं मार्जिन
+                </h3>
+                <button onclick="closeModal('page-setup-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-600 uppercase mb-1">टॉप मार्जिन (mm)</label>
+                    <input type="number" id="setup-margin-top" value="20" min="0" max="60" oninput="applyPageSetup()" class="w-full border border-slate-300 rounded p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 uppercase mb-1">बॉटम मार्जिन (mm)</label>
+                    <input type="number" id="setup-margin-bottom" value="20" min="0" max="60" oninput="applyPageSetup()" class="w-full border border-slate-300 rounded p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 uppercase mb-1">लेफ्ट मार्जिन (mm)</label>
+                    <input type="number" id="setup-margin-left" value="20" min="0" max="60" oninput="applyPageSetup()" class="w-full border border-slate-300 rounded p-2">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 uppercase mb-1">राइट मार्जिन (mm)</label>
+                    <input type="number" id="setup-margin-right" value="20" min="0" max="60" oninput="applyPageSetup()" class="w-full border border-slate-300 rounded p-2">
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-2 border-t text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">पेज दिशा (Orientation)</label>
+                    <select id="setup-orientation" onchange="applyPageSetup()" class="w-full border border-slate-300 rounded p-2">
+                        <option value="portrait">पोर्ट्रेट (Portrait - खड़ा पेज)</option>
+                        <option value="landscape">लैंडस्केप (Landscape - आड़ा पेज)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-3 border-t">
+                <button onclick="resetPageMargins()" class="text-xs text-indigo-600 font-semibold hover:underline">डीफ़ॉल्ट सेट करें</button>
+                <button onclick="closeModal('page-setup-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-lg font-semibold">सहेजें व बंद करें</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: HEADER SETUP -->
+    <div id="header-setup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-heading text-purple-600"></i> संस्था शीर्षक एवं फ़ॉन्ट सेटिंग
+                </h3>
+                <button onclick="closeModal('header-setup-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 uppercase mb-1">संस्था / न्यायालय का नाम (मुख्य शीर्षक)</label>
+                    <textarea id="cfg-company-name" rows="2" oninput="updateDocumentHeader()" class="w-full border border-slate-300 rounded-lg p-2 font-semibold focus:ring-1 focus:ring-indigo-500">न्यायालय नियंत्रक प्राधिकारी, उपादान भुगतान अधिनियम, 1972 एवं कार्यालय श्रम पदाधिकारी, जिला-रतलाम (म.प्र.)</textarea>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 uppercase mb-1">पता / उप-शीर्षक (Sub-header)</label>
+                    <textarea id="cfg-company-sub" rows="2" oninput="updateDocumentHeader()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500">नवीन कलेक्टोरेट भवन, द्वितीय तल, कक्ष क्र. 229, रतलाम - 457001, - 07412-270455&#10;E-mail : loratlam@mp.gov.in, loratlam2020@gmail.com</textarea>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 border-t pt-3">
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">शीर्षक फ़ॉन्ट</label>
+                        <select id="hdr-font-family" onchange="updateHeaderFormatting()" class="w-full border border-slate-300 rounded p-1.5">
+                            <option value="font-rozha">Rozha One (शाही)</option>
+                            <option value="font-yatra">Yatra One (यात्रा)</option>
+                            <option value="font-hind">Hind (हिन्दी)</option>
+                            <option value="font-noto">Noto Sans Devanagari</option>
+                            <option value="font-gotu">Gotu (गोतू)</option>
+                            <option value="font-serif-std">Times / Serif</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">फ़ॉन्ट आकार</label>
+                        <select id="hdr-font-size" onchange="updateHeaderFormatting()" class="w-full border border-slate-300 rounded p-1.5">
+                            <option value="text-sm">14px (छोटा)</option>
+                            <option value="text-base">16px (सामान्य)</option>
+                            <option value="text-lg" selected>18px (मध्यम)</option>
+                            <option value="text-xl">20px (बड़ा)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">एलाइनमेंट</label>
+                        <select id="hdr-alignment" onchange="updateHeaderFormatting()" class="w-full border border-slate-300 rounded p-1.5">
+                            <option value="text-center" selected>सेंटर (Center)</option>
+                            <option value="text-left">बायां (Left)</option>
+                            <option value="text-right">दायां (Right)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-3 border-t">
+                <button onclick="closeModal('header-setup-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-lg font-semibold">सहेजें व लागू करें</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let detectedVars = [];
+        let tableData = [
+            {
+                "दिनांक": "13/10/2026",
+                "आवेदक_का_नाम": "रमेश चंद्र शर्मा",
+                "पिता_का_नाम": "सुरेश चंद्र शर्मा",
+                "पूर्ण_पता": "12, सालाखेड़ी रोड, रतलाम (म.प्र.)",
+                "विषय": "ग्रेच्युटी भुगतान ना मिलने",
+                "प्रथम_नियुक्ति_दिनांक": "2010-05-15",
+                "सेवानिवृत्ति_दिनांक": "2025-05-14",
+                "*मामले_का_विवरण": "अनावेदक संस्थान द्वारा सेवा के 15 वर्ष पूर्ण होने के उपरांत भी ग्रेच्युटी राशि का भुगतान नहीं किया गया है।",
+                "प्रकरण_क्रमांक": "45/2026/उपादान",
+                "सुनवाई_दिनांक": "25/11/2026"
+            }
+        ];
+
+        window.onload = function() {
+            const savedUser = localStorage.getItem("loggedInUser");
+            if (!savedUser) {
+                window.location.href = "index.html";
+                return;
+            }
+            const user = JSON.parse(savedUser);
+            document.getElementById('user-display-name').innerText = user.fullName || user.userId;
+
+            // Load Hibernated state if available
+            loadSavedState(user.userId);
+            loadSavedTemplatesMenu();
+            scanForVariables();
+        };
+
+        // HIBERNATION STATE SAVE & LOAD
+        function triggerHibernation() {
+            const savedUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+            if (!savedUser.userId) return;
+
+            const stateData = {
+                editorHTML: document.getElementById('letter-body-editor').innerHTML,
+                companyName: document.getElementById('cfg-company-name').value,
+                companySub: document.getElementById('cfg-company-sub').value,
+                tableData: tableData
+            };
+
+            localStorage.setItem("hibernation_state_" + savedUser.userId, JSON.stringify(stateData));
+            alert("State successfully save (Hibernate) ho gaya hai!");
+        }
+
+        function loadSavedState(userId) {
+            const saved = localStorage.getItem("hibernation_state_" + userId);
+            if (!saved) return;
+
+            try {
+                const data = JSON.parse(saved);
+                if (data.editorHTML) document.getElementById('letter-body-editor').innerHTML = data.editorHTML;
+                if (data.companyName) document.getElementById('cfg-company-name').value = data.companyName;
+                if (data.companySub) document.getElementById('cfg-company-sub').value = data.companySub;
+                if (data.tableData) tableData = data.tableData;
+
+                updateDocumentHeader();
+                scanForVariables();
+            } catch (e) {
+                console.error("Error loading state", e);
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem("loggedInUser");
+            window.location.href = "index.html";
+        }
+
+        // TEMPLATE SAVING & LOADING
+        function saveCurrentTemplate() {
+            const templateName = prompt("इस टेम्पलेट का नाम दर्ज करें:");
+            if (!templateName) return;
+
+            const templates = JSON.parse(localStorage.getItem("saved_templates") || "{}");
+            templates[templateName] = {
+                editorHTML: document.getElementById('letter-body-editor').innerHTML,
+                companyName: document.getElementById('cfg-company-name').value,
+                companySub: document.getElementById('cfg-company-sub').value,
+                tableData: tableData
+            };
+
+            localStorage.setItem("saved_templates", JSON.stringify(templates));
+            loadSavedTemplatesMenu();
+            alert("टेम्पलेट सफलतापूर्वक सहेज लिया गया है!");
+        }
+
+        function loadSavedTemplatesMenu() {
+            const menu = document.getElementById('saved-templates-menu');
+            const templates = JSON.parse(localStorage.getItem("saved_templates") || "{}");
+            const keys = Object.keys(templates);
+
+            if (keys.length === 0) {
+                menu.innerHTML = `<div class="px-4 py-2 text-xs text-slate-400 italic">कोई टेम्पलेट सहेजा नहीं गया</div>`;
+                return;
+            }
+
+            menu.innerHTML = keys.map(name => `
+                <div class="flex items-center justify-between px-4 py-1.5 hover:bg-slate-100 text-xs">
+                    <button onclick="loadTemplate('${name}')" class="text-left font-medium text-slate-700 truncate flex-1">${name}</button>
+                    <button onclick="deleteTemplate(event, '${name}')" class="text-rose-500 hover:text-rose-700 ml-2"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function loadTemplate(name) {
+            const templates = JSON.parse(localStorage.getItem("saved_templates") || "{}");
+            if (templates[name]) {
+                const t = templates[name];
+                document.getElementById('letter-body-editor').innerHTML = t.editorHTML;
+                document.getElementById('cfg-company-name').value = t.companyName;
+                document.getElementById('cfg-company-sub').value = t.companySub;
+                if (t.tableData) tableData = t.tableData;
+
+                updateDocumentHeader();
+                scanForVariables();
+                alert(`टेम्पलेट "${name}" लोड हो गया है!`);
+            }
+        }
+
+        function deleteTemplate(e, name) {
+            e.stopPropagation();
+            if (confirm(`क्या आप टेम्पलेट "${name}" हटाना चाहते हैं?`)) {
+                let templates = JSON.parse(localStorage.getItem("saved_templates") || "{}");
+                delete templates[name];
+                localStorage.setItem("saved_templates", JSON.stringify(templates));
+                loadSavedTemplatesMenu();
+            }
+        }
+
+        function switchTab(tab) {
+            document.getElementById('section-editor').classList.toggle('hidden', tab !== 'editor');
+            document.getElementById('section-table').classList.toggle('hidden', tab !== 'table');
+            document.getElementById('section-preview').classList.toggle('hidden', tab !== 'preview');
+            document.getElementById('editor-toolbar').classList.toggle('hidden', tab !== 'editor');
+
+            document.getElementById('tab-editor-btn').className = tab === 'editor' ? 'px-3.5 py-1.5 rounded bg-indigo-600 text-white font-semibold shadow' : 'px-3.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700';
+            document.getElementById('tab-table-btn').className = tab === 'table' ? 'px-3.5 py-1.5 rounded bg-indigo-600 text-white font-semibold shadow' : 'px-3.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700';
+            document.getElementById('tab-preview-btn').className = tab === 'preview' ? 'px-3.5 py-1.5 rounded bg-indigo-600 text-white font-semibold shadow' : 'px-3.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700';
+
+            if (tab === 'table') renderTable();
+            if (tab === 'preview') generateAllLetters();
+        }
+
+        function execCmd(command) {
+            document.execCommand(command, false, null);
+        }
+
+        function scanForVariables() {
+            const editor = document.getElementById('letter-body-editor');
+            const tags = editor.querySelectorAll('.var-tag');
+            detectedVars = [];
+
+            tags.forEach(tag => {
+                let text = tag.innerText.trim().replace(/^\{\{|\}\}$/g, '');
+                if (text && !detectedVars.includes(text)) {
+                    detectedVars.push(text);
+                }
+            });
+
+            document.getElementById('var-count-badge').innerText = detectedVars.length;
+            const container = document.getElementById('detected-vars-list');
+            
+            if (detectedVars.length === 0) {
+                container.innerHTML = `<span class="text-slate-400 italic">कोई नहीं</span>`;
+            } else {
+                container.innerHTML = detectedVars.map(v => `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[11px] font-semibold border border-amber-300">${v}</span>`).join('');
+            }
+        }
+
+        function openPlaceholderModal() {
+            const name = prompt("प्लेसहोल्डर का नाम दर्ज करें (उदा. नाम, पद, शहर):");
+            if (!name) return;
+            const cleanName = name.replace(/[\{\}]/g, '').trim();
+            const tagHtml = `<span class="var-tag" contenteditable="false">{{${cleanName}}}</span>&nbsp;`;
+            document.execCommand('insertHTML', false, tagHtml);
+            scanForVariables();
+        }
+
+        function openFormulaModal() {
+            const formula = prompt("फॉर्मूला दर्ज करें (उदा. =DATEDIFF_Y({{प्रथम_नियुक्ति_दिनांक}},{{सेवानिवृत्ति_दिनांक}})):");
+            if (!formula) return;
+            const tagHtml = `<span class="var-tag formula-tag" contenteditable="false">{{${formula.trim()}}}</span>&nbsp;`;
+            document.execCommand('insertHTML', false, tagHtml);
+            scanForVariables();
+        }
+
+        function extractAndProceedToTable() {
+            scanForVariables();
+            switchTab('table');
+        }
+
+        function renderTable() {
+            const thead = document.getElementById('table-header-row');
+            const tbody = document.getElementById('table-body-rows');
+            const emptyMsg = document.getElementById('table-empty-msg');
+
+            if (detectedVars.length === 0) {
+                thead.innerHTML = '';
+                tbody.innerHTML = '';
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+            emptyMsg.classList.add('hidden');
+
+            thead.innerHTML = `<th class="p-2 border border-slate-300 text-center w-10">#</th>` + 
+                detectedVars.map(v => `<th class="p-2 border border-slate-300 font-bold">${v}</th>`).join('') +
+                `<th class="p-2 border border-slate-300 text-center w-16">कार्रवाई</th>`;
+
+            tbody.innerHTML = tableData.map((row, idx) => {
+                return `<tr class="hover:bg-slate-50">
+                    <td class="p-2 border border-slate-300 text-center font-bold text-xs bg-slate-100">${idx + 1}</td>
+                    ${detectedVars.map(v => {
+                        const val = row[v] || '';
+                        return `<td class="p-1 border border-slate-300">
+                            <input type="text" value="${val}" oninput="updateTableCell(${idx}, '${v}', this.value)" class="w-full p-1 text-xs border border-transparent focus:border-indigo-400 rounded focus:outline-none">
+                        </td>`;
+                    }).join('')}
+                    <td class="p-2 border border-slate-300 text-center">
+                        <button onclick="deleteTableRow(${idx})" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('records-count-badge').innerText = tableData.length;
+        }
+
+        function updateTableCell(rowIdx, varName, value) {
+            if (!tableData[rowIdx]) tableData[rowIdx] = {};
+            tableData[rowIdx][varName] = value;
+        }
+
+        function addTableRow() {
+            let newRow = {};
+            detectedVars.forEach(v => newRow[v] = '');
+            tableData.push(newRow);
+            renderTable();
+        }
+
+        function deleteTableRow(idx) {
+            tableData.splice(idx, 1);
+            renderTable();
+        }
+
+        function clearAllTableData() {
+            if (confirm("क्या आप सभी तालिका डेटा हटाना चाहते हैं?")) {
+                tableData = [];
+                renderTable();
+            }
+        }
+
+        function calculateFormula(formulaStr, rowData) {
+            try {
+                if (formulaStr.startsWith('=DATEDIFF_Y')) {
+                    const matches = formulaStr.match(/\{\{([^}]+)\}\}/g);
+                    if (matches && matches.length >= 2) {
+                        const date1Str = rowData[matches[0].replace(/[\{\}]/g, '')];
+                        const date2Str = rowData[matches[1].replace(/[\{\}]/g, '')];
+                        
+                        if (date1Str && date2Str) {
+                            const d1 = new Date(date1Str);
+                            const d2 = new Date(date2Str);
+                            const diffTime = Math.abs(d2 - d1);
+                            const diffYears = (diffTime / (1000 * 60 * 60 * 24 * 365.25)).toFixed(1);
+                            return isNaN(diffYears) ? '0' : diffYears;
+                        }
+                    }
+                }
+            } catch (e) {
+                return 'Error';
+            }
+            return formulaStr;
+        }
+
+        function generateAllLetters() {
+            const printArea = document.getElementById('print-area');
+            const editorContent = document.getElementById('a4-editor-canvas').outerHTML;
+            printArea.innerHTML = '';
+
+            if (tableData.length === 0) {
+                printArea.innerHTML = `<div class="text-center py-8 text-slate-500">कोई रिकॉर्ड उपलब्ध नहीं है।</div>`;
+                document.getElementById('generated-count').innerText = 0;
+                return;
+            }
+
+            tableData.forEach((row, idx) => {
+                let pageDiv = document.createElement('div');
+                pageDiv.innerHTML = editorContent;
+                let pageElement = pageDiv.firstElementChild;
+                pageElement.id = `generated-page-${idx}`;
+
+                let bodyEditor = pageElement.querySelector('#letter-body-editor');
+                bodyEditor.removeAttribute('contenteditable');
+
+                let tags = bodyEditor.querySelectorAll('.var-tag');
+                tags.forEach(tag => {
+                    let rawText = tag.innerText.trim().replace(/^\{\{|\}\}$/g, '');
+                    let value = '';
+
+                    if (rawText.startsWith('=')) {
+                        value = calculateFormula(rawText, row);
+                    } else {
+                        value = row[rawText] || '..............';
+                    }
+
+                    let span = document.createElement('span');
+                    span.className = 'font-bold border-b border-slate-700 px-1';
+                    span.innerText = value;
+                    tag.parentNode.replaceChild(span, tag);
+                });
+
+                printArea.appendChild(pageElement);
+            });
+
+            document.getElementById('generated-count').innerText = tableData.length;
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function applyPageSetup() {
+            const top = document.getElementById('setup-margin-top').value || 20;
+            const bottom = document.getElementById('setup-margin-bottom').value || 20;
+            const left = document.getElementById('setup-margin-left').value || 20;
+            const right = document.getElementById('setup-margin-right').value || 20;
+            const orientation = document.getElementById('setup-orientation').value;
+
+            const page = document.getElementById('a4-editor-canvas');
+            page.style.paddingTop = top + 'mm';
+            page.style.paddingBottom = bottom + 'mm';
+            page.style.paddingLeft = left + 'mm';
+            page.style.paddingRight = right + 'mm';
+
+            page.classList.toggle('landscape', orientation === 'landscape');
+        }
+
+        function resetPageMargins() {
+            document.getElementById('setup-margin-top').value = 20;
+            document.getElementById('setup-margin-bottom').value = 20;
+            document.getElementById('setup-margin-left').value = 20;
+            document.getElementById('setup-margin-right').value = 20;
+            applyPageSetup();
+        }
+
+        function updateDocumentHeader() {
+            document.getElementById('view-company-name').innerText = document.getElementById('cfg-company-name').value;
+            document.getElementById('view-company-sub').innerText = document.getElementById('cfg-company-sub').value;
+        }
+
+        function updateHeaderFormatting() {
+            const font = document.getElementById('hdr-font-family').value;
+            const size = document.getElementById('hdr-font-size').value;
+            const align = document.getElementById('hdr-alignment').value;
+
+            const headerName = document.getElementById('view-company-name');
+            headerName.className = `font-bold tracking-wide text-slate-900 leading-snug whitespace-pre-line ${font} ${size} ${align}`;
+        }
+
+        function applyBodyFormatting() {
+            const font = document.getElementById('body-font-family').value;
+            const size = document.getElementById('body-font-size').value;
+            const editor = document.getElementById('letter-body-editor');
+
+            editor.className = `letter-content ${font} focus:outline-none focus:ring-1 focus:ring-indigo-300 p-2 rounded min-h-[550px]`;
+            editor.style.fontSize = size;
+        }
+
+        function importExcelData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheet = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheet];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                if (jsonData && jsonData.length > 0) {
+                    tableData = jsonData;
+                    renderTable();
+                    alert("Excel/CSV डेटा सफलतापूर्वक इम्पोर्ट हो गया है!");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function exportAllPDF() {
+            const element = document.getElementById('print-area');
+            const opt = {
+                margin: 0,
+                filename: 'Generated_Letters.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function exportAllDoc() {
+            const content = document.getElementById('print-area').innerHTML;
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Exported Letters</title></head><body>";
+            const footer = "</body></html>";
+            const sourceHTML = header + content + footer;
+
+            const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+            const fileDownload = document.createElement("a");
+            document.body.appendChild(fileDownload);
+            fileDownload.href = source;
+            fileDownload.download = 'Generated_Letters.doc';
+            fileDownload.click();
+            document.body.removeChild(fileDownload);
+        }
+
+        function clearCanvasCompletely() {
+            if (confirm("क्या आप पूरे कैनवास को साफ़ करना चाहते हैं?")) {
+                document.getElementById('letter-body-editor').innerHTML = '<p><br></p>';
+                scanForVariables();
+            }
+        }
+
+        function removeSelectedOrHoveredTag() {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                const node = sel.anchorNode.parentElement;
+                if (node && node.classList.contains('var-tag')) {
+                    node.remove();
+                    scanForVariables();
+                } else {
+                    alert("कृपया हटाने के लिए किसी प्लेसहोल्डर टैग पर क्लिक करें या उसे सेलेक्ट करें।");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
