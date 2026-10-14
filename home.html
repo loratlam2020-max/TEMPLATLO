@@ -559,7 +559,7 @@
         window.onload = function() {
             const savedUser = localStorage.getItem("loggedInUser");
             if (!savedUser) {
-                window.location.href = "Index.html";
+                window.location.href = "index.html";
                 return;
             }
             const user = JSON.parse(savedUser);
@@ -607,7 +607,7 @@
 
         function handleLogout() {
             localStorage.removeItem("loggedInUser");
-            window.location.href = "Index.html";
+            window.location.href = "index.html";
         }
 
         // TEMPLATE SAVING & LOADING
