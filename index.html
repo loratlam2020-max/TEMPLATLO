@@ -127,6 +127,31 @@
         .field.green:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(18,184,134,.18); }
         .field-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 14px; }
         ::selection { background: #ff9933; color: #fff; }
+/* स्पिनर स्टाइल */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff; /* स्पिनर का रंग */
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* घूमने की एनीमेशन */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* जब बटन डिसेबल हो तब का लुक */
+#login-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+        
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -381,36 +406,48 @@ Account already exists? <button onclick="toggleAuthMode('login')" class="text-em
             }
         }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const userId = document.getElementById('login-userid').value;
-            const password = document.getElementById('login-password').value;
-            const btn = document.getElementById('login-btn');
-            btn.disabled = true;
+    async function handleLogin(e) {
+    e.preventDefault();
+    const userId = document.getElementById('login-userid').value;
+    const password = document.getElementById('login-password').value;
+    const btn = document.getElementById('login-btn');
 
-            try {
-                const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'login', userId, password })
-                });
-                const result = await response.json();
-                if (result.status === "success") {
-                    showStatus("Login successful!", true);
-                    localStorage.setItem("loggedInUser", JSON.stringify(result.user));
-                    setTimeout(() => {
-                        closeAuthModal();
-                        window.location.href = "home.html"; // Redirect to main dashboard
-                    }, 800);
-                } else {
-                    showStatus(result.message, false);
-                }
-            } catch (err) {
-                showStatus("Failed to connect!", false);
-            } finally {
-                btn.disabled = false;
-            }
+    // मूल बटन टेक्स्ट को सुरक्षित रखें (ताकि बाद में वापस लाया जा सके)
+    const originalText = btn.innerHTML;
+
+    // 1. लोडिंग एनीमेशन और टेक्स्ट दिखाएं, और बटन को डिसेबल करें
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner"></span> Logging in...`;
+
+    try {
+        const response = await fetch(GOOGLE_SHEET_WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'login', userId, password })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === "success") {
+            showStatus("Login successful!", true);
+            localStorage.setItem("loggedInUser", JSON.stringify(result.user));
+            setTimeout(() => {
+                closeAuthModal();
+                window.location.href = "home.html"; // डैशबोर्ड पर रिडायरेक्ट करें
+            }, 800);
+        } else {
+            showStatus(result.message, false);
+            // गलती होने पर बटन को वापस सामान्य स्थिति में लाएं
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         }
+    } catch (err) {
+        showStatus("Failed to connect!", false);
+        // नेटवर्क एरर होने पर बटन को वापस सामान्य स्थिति में लाएं
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
     </script>
 </body>
 </html>
