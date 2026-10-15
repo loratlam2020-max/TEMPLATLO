@@ -375,7 +375,7 @@ Account already exists? <button onclick="toggleAuthMode('login')" class="text-em
                     showStatus(result.message, false);
                 }
             } catch (err) {
-                showStatus("Google Sheet API से कनेक्ट करने में विफल!", false);
+                showStatus("Failed to connect!", false);
             } finally {
                 btn.disabled = false;
             }
@@ -396,7 +396,7 @@ Account already exists? <button onclick="toggleAuthMode('login')" class="text-em
                 });
                 const result = await response.json();
                 if (result.status === "success") {
-                    showStatus("लॉगिन सफल!", true);
+                    showStatus("Login successful!", true);
                     localStorage.setItem("loggedInUser", JSON.stringify(result.user));
                     setTimeout(() => {
                         closeAuthModal();
@@ -406,7 +406,7 @@ Account already exists? <button onclick="toggleAuthMode('login')" class="text-em
                     showStatus(result.message, false);
                 }
             } catch (err) {
-                showStatus("Google Sheet API से कनेक्ट करने में विफल!", false);
+                showStatus("Failed to connect!", false);
             } finally {
                 btn.disabled = false;
             }
